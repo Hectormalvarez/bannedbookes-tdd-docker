@@ -17,15 +17,15 @@ class Book(models.Model):
 
 
 class Ban(models.Model):
-    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    book = models.ForeignKey(Book,related_name='bans', on_delete=models.CASCADE)
     type_of_ban = models.CharField(max_length=50)
     secondary_author = models.CharField(max_length=100, blank=True, null=True)
     illustrator = models.CharField(max_length=100, blank=True, null=True)
     translator = models.CharField(max_length=100, blank=True, null=True)
     state = models.CharField(max_length=50)
     district = models.CharField(max_length=100)
-    date_of_challenge_removal = models.DateField()
+    date_of_challenge_removal = models.CharField(max_length=50)
     origin_of_challenge = models.CharField(max_length=100)
 
     def __str__(self):
-        return f"{self.district}, in {self.state}"
+        return f"{self.district}, {self.state}"
