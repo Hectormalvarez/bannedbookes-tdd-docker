@@ -1,7 +1,5 @@
-from datetime import date
-import json
-
 import pytest
+from rest_framework.test import APIClient
 
 from books.models import Ban, Book
 
@@ -83,21 +81,57 @@ def test_add_book_ban(client, add_book):
 
     book = add_book(title="The Awakening", author="Kate Chopin")
     resp = client.post(
-        f"/api/v1/books/{book.id}/ban/",
-        {
-            "book": book.id,
-            "type_of_ban": "Banned in schools",
-            "secondary_author": "",
-            "illustrator": "",
-            "translator": "",
-            "state": "New York",
-            "district": "Manhattan",
-            "date_of_challenge_removal": "9/2021",
-            "origin_of_challenge": "Parents group",
-        },
+        f"/api/v1/books/{book.id}/bans/",
+        [
+            {
+                "book": book.id,
+                "type_of_ban": "Banned in schools",
+                "secondary_author": "",
+                "illustrator": "",
+                "translator": "",
+                "state": "New York",
+                "district": "Manhattan",
+                "date_of_challenge_removal": "9/2021",
+                "origin_of_challenge": "Parents group",
+            },
+        ],
         content_type="application/json",
     )
     assert resp.status_code == 201
 
     ban = Ban.objects.all()
     assert len(ban) == 1
+
+
+@pytest.mark.django_db
+def test_add_book_with_bans():
+    client = APIClient()
+
+    book_with_bans = {
+        "title": "The Poet X",
+        "author": "Elizabeth Acevedo",
+        "bans": [
+            {
+                "type_of_ban": "Banned Pending Investigation",
+                "state": "Texas",
+                "district": "Fredericksburg Independent School District",
+                "date_of_challenge_removal": "March 2022",
+                "origin_of_challenge": "Administrator",
+            },
+            {
+                "type_of_ban": "Banned in Libraries",
+                "state": "Virginia",
+                "district": "New Kent County Public Schools",
+                "date_of_challenge_removal": "October 2021",
+                "origin_of_challenge": "Administrator",
+            },
+        ],
+    }
+
+    resp = client.post(
+        "/api/v1/books/",
+        book_with_bans,
+        format="json",  # Use 'format="json"' instead of 'content_type="application/json"'
+    )
+    print(resp.data)
+    assert resp.status_code == 201

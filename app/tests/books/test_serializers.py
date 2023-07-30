@@ -1,8 +1,31 @@
 import pytest
-from datetime import date
-from django.utils.timezone import now
-from books.models import Book, Ban
-from books.serializers import BanSerializer, BookSerializer
+from books.models import Book
+from books.serializers import BookSerializer, BanSerializer
+
+
+@pytest.mark.django_db
+def test_valid_book_serializer():
+    valid_serializer_data = {
+        "title": "harry potter",
+        "author": "JK Rowling",
+    }
+    serializer = BookSerializer(data=valid_serializer_data)
+    assert serializer.is_valid()
+    assert serializer.validated_data == valid_serializer_data
+    assert serializer.data == valid_serializer_data
+    assert serializer.errors == {}
+
+
+@pytest.mark.django_db
+def test_invalid_book_serializer():
+    invalid_serializer_data = {
+        "title": "harry potter",
+    }
+    serializer = BookSerializer(data=invalid_serializer_data)
+    assert not serializer.is_valid()
+    assert serializer.validated_data == {}
+    assert serializer.data == invalid_serializer_data
+    assert serializer.errors == {"author": ["This field is required."]}
 
 
 @pytest.mark.django_db
