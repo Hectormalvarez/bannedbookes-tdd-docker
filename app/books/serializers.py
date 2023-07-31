@@ -13,6 +13,11 @@ class BanSerializer(serializers.ModelSerializer):
                 "allow_blank": True,
                 "allow_null": True,
             },
+            "date_of_challenge": {
+                "required": False,
+                "allow_blank": True,
+                "allow_null": True,
+            },
             "illustrator": {"required": False, "allow_blank": True, "allow_null": True},
             "translator": {"required": False, "allow_blank": True, "allow_null": True},
         }
@@ -24,3 +29,6 @@ class BookSerializer(serializers.ModelSerializer):
     class Meta:
         model = Book
         fields = ("id", "title", "author", "created_date", "updated_date", "bans")
+        extra_kwargs = {
+            "bans": {"required": False, "allow_null": True, "allow_blank": True}
+        }
